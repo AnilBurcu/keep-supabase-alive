@@ -1,0 +1,34 @@
+name: Supabase Keep-Alive
+
+on:
+  schedule:
+    - cron: '23 3 * * *'   # every day at 03:23 UTC, change if you like
+  workflow_dispatch: {}     # lets you run it manually from the Actions tab
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false      # one failing project does not stop the others
+      matrix:
+        include:
+          # One block per Supabase project.
+          # url:        your project URL (Dashboard > Settings > API)
+          # key_secret: the name of the GitHub secret holding that project's anon key
+          - name: project-1
+            url: https://YOUR_PROJECT_REF_1.supabase.co
+            key_secret: ANON_KEY_PROJECT_1
+          - name: project-2
+            url: https://YOUR_PROJECT_REF_2.supabase.co
+            key_secret: ANON_KEY_PROJECT_2
+    steps:
+      - name: Ping ${{ matrix.name }}
+        run: |
+          code=$(curl -s -o /tmp/resp -w '%{http_code}' -X POST \
+            "${{ matrix.url }}/rest/v1/rpc/keep_alive" \
+            -H "apikey: ${{ secrets[matrix.key_secret] }}" \
+            -H "Authorization: Bearer ${{ secrets[matrix.key_secret] }}" \
+            -H "Content-Type: application/json" \
+            -d '{}')
+          echo "HTTP $code - $(cat /tmp/resp)"
+          [ "$code" = "200" ]
