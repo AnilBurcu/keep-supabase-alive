@@ -124,6 +124,12 @@ repos do not have this rule, which is why a private copy is recommended.
 Around 1 minute per day. The free tier for private repos alone is 2000
 minutes per month.
 
+**Does this back up my database?**
+No. It only keeps the project awake, and free plan projects have no backups
+of their own. For a daily backup, use
+[supabase-free-backup](https://github.com/AnilBurcu/supabase-free-backup). Its
+daily dump also counts as database activity, so you do not need both.
+
 ## License
 
 MIT
